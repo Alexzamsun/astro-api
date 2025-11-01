@@ -1,5 +1,5 @@
 fastapi
-pydantic
-lunar_python==1.6.10
-pytz
 uvicorn
+pydantic
+pytz
+lunar_python>=1.2,<2.0
