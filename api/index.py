@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import Response
 from pydantic import BaseModel
 from lunar_python import Solar, BaZi
 import pytz
@@ -9,6 +10,11 @@ app = FastAPI()
 class BaziReq(BaseModel):
     datetime_utc: str
     timezone: str
+
+@app.get("/favicon.ico")
+def favicon():
+    # 返回 204，避免日志里出现大量 500
+    return Response(status_code=204)
 
 @app.get("/")
 def health():
@@ -27,10 +33,10 @@ def get_bazi(req: BaziReq):
 
         return {
             "pillars": {
-                "year": {"stem": bazi.getYearGan(), "branch": bazi.getYearZhi()},
+                "year":  {"stem": bazi.getYearGan(),  "branch": bazi.getYearZhi()},
                 "month": {"stem": bazi.getMonthGan(), "branch": bazi.getMonthZhi()},
-                "day": {"stem": bazi.getDayGan(), "branch": bazi.getDayZhi()},
-                "hour": {"stem": bazi.getTimeGan(), "branch": bazi.getTimeZhi()},
+                "day":   {"stem": bazi.getDayGan(),   "branch": bazi.getDayZhi()},
+                "hour":  {"stem": bazi.getTimeGan(),  "branch": bazi.getTimeZhi()}
             },
             "local_time": local_time.strftime("%Y-%m-%d %H:%M:%S"),
             "timezone": req.timezone
