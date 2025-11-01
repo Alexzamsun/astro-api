@@ -1,0 +1,101 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Astro Bazi API",
+    "version": "1.0.0",
+    "description": "Get BaZi (Four Pillars) by UTC datetime and IANA timezone."
+  },
+  "servers": [
+    { "url": "https://astro-api-pied.vercel.app" }
+  ],
+  "paths": {
+    "/api/bazi/chart": {
+      "get": {
+        "operationId": "baziChartGet",
+        "summary": "Get Bazi (Four Pillars) by UTC datetime and timezone",
+        "parameters": [
+          {
+            "name": "datetime_utc",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string", "format": "date-time" },
+            "example": "2025-01-16T08:30:00Z",
+            "description": "ISO8601 UTC datetime (must end with Z or +00:00)"
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Asia/Singapore",
+            "description": "IANA timezone (e.g. Asia/Singapore)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BaziResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string" },
+                    "trace": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Pillar": {
+        "type": "object",
+        "properties": {
+          "stem": { "type": "string" },
+          "branch": { "type": "string" }
+        },
+        "required": ["stem", "branch"]
+      },
+      "BaziResponse": {
+        "type": "object",
+        "properties": {
+          "pillars": {
+            "type": "object",
+            "properties": {
+              "year":  { "$ref": "#/components/schemas/Pillar" },
+              "month": { "$ref": "#/components/schemas/Pillar" },
+              "day":   { "$ref": "#/components/schemas/Pillar" },
+              "hour":  { "$ref": "#/components/schemas/Pillar" }
+            },
+            "required": ["year", "month", "day", "hour"]
+          },
+          "local_time": { "type": "string" },
+          "timezone":   { "type": "string" }
+        },
+        "required": ["pillars", "local_time", "timezone"]
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
+    }
+  }
+}
